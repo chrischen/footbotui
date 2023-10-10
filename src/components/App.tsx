@@ -1,19 +1,22 @@
-import { Suspense } from "react";
-import { graphql } from "react-relay";
+import { useRef, useCallback } from "react";
 import { css, cx } from "@linaria/core";
 import { t } from "@lingui/macro";
+import { useLoaderData } from "react-router-dom";
+import { graphql, usePreloadedQuery } from "react-relay";
+import { AppQuery as AppQueryType } from "../__generated__/AppQuery.graphql";
 import reactLogo from "../assets/react.svg";
 import viteLogo from "/vite.svg";
-import ServerTime from "./ServerTime";
-import ServerTime2 from "./ServerTime2";
-import { usePreloadedQuery } from "react-relay";
-import { useLoaderData } from "react-router-dom";
-import Counter from "./Counter";
 import "./App.css";
 import "./index.css";
-import type { LoaderData } from './helpers/router'
-import { loader } from './HomePageRoute'
+import "../global/static.css";
 
+export const AppQuery = graphql`
+  query AppQuery {
+    jobs {
+      id
+    }
+  }
+`;
 // Component-styles and using @apply to abstract tailwind styles is discouraged.
 // Abstractions should always be at the component level–not at the style level.
 const header = css`
@@ -22,51 +25,60 @@ const header = css`
   @apply font-bold py-10 px-4;
 `;
 
-export const AppQuery = graphql`
-  query AppQuery {
-    ...ServerTimeFragment @defer
-    ...ServerTime2Fragment @defer
-  }
-`;
 function App() {
   const ref = useLoaderData() as LoaderData<typeof loader>;
-  const data = usePreloadedQuery(AppQuery, ref);
+  const data = usePreloadedQuery<AppQueryType>(AppQuery, ref);
+  const scheduleDateInput = useRef<HTMLInputElement>(null);
+  const dateInput = useRef<HTMLInputElement>(null);
+  const fieldInput = useRef<HTMLInputElement>(null);
+  const startTimeInput = useRef<HTMLInputElement>(null);
+  const endTimeInput = useRef<HTMLInputElement>(null);
+  const submit = useCallback(
+    () => (e) => {
+      e.preventDefault();
+      const createJobInput = {
+        time: new Date(scheduleDateInput.current?.value),
+        attempts: 5,
+        interval: 30,
+        form: {
+          date: new Date(dateInput.current?.value),
+          startTime: parseInt(startTimeInput.current?.value),
+          endTime: parseInt(endTimeInput.current?.value),
+          field: '123',
+          shop: '2013'
 
+        }
+      }
+      console.log(createJobInput);
+      alert("Hello World!");
+    },
+    []
+  );
+  console.log(data);
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo inline-block" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img
-            src={reactLogo}
-            className={cx("logo react", "inline-block")}
-            alt="React logo"
-          />
-        </a>
+      <h1 className={header}>{t`FootBot`}</h1>
+      <p className="mb-4">{t`Advanced Futsal Court Booking System`}</p>
+      <div className="mb-4">
+        <form onSubmit={submit()}>
+          <input type="text" name="date" ref={scheduleDateInput} placeholder="4/13/2023" />
+          <input type="text" name="date" ref={dateInput} placeholder="5/13/2023" />
+          <input type="text" name="court" ref={fieldInput} placeholder="215" />
+          <input type="text" name="startTime" ref={startTimeInput} placeholder="1700" />
+          <input type="text" name="endTime" ref={endTimeInput} placeholder="2100" />
+          <input type="submit" value="Schedule" />
+        </form>
       </div>
-      <h1 className={header}>{t`Hello`}</h1>
-      <Suspense fallback="Loading">
-        <ServerTime data={data} />
-      </Suspense>
-      <Suspense fallback="Loading">
-        <ServerTime2 data={data} />
-      </Suspense>
-      <Counter />
-      <p className="mb-4">
-        This page demonstrates usage of <b>Lingui</b> for internationalization,{" "}
-        <b>Tailwind</b> styles, and <b>Linaria</b> for component-specific
-        styles. Additionally it is also rendered using React streaming SSR.
-      </p>
-      <div className="border-2 border-white rounded-md mb-4 p-4">
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {data.jobs.map((job) => {
+        return (
+          <div className="border-2 border-white rounded-md mb-4 p-4">
+            <p className="">
+              {t`Scheduled`}: {job.id}
+            </p>
+          </div>
+        );
+      })}
+      <p className="read-the-docs">Powered by Chris Chen</p>
     </>
   );
 }
