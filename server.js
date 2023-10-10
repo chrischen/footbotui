@@ -1,8 +1,9 @@
 import fs from "node:fs";
+import url from "url";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
-import expressStaticGzip from "express-static-gzip";
+// import expressStaticGzip from "express-static-gzip";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -14,6 +15,17 @@ const cssCache = {};
 let compiledCss;
 let enableCriticalCss = false;
 
+function addProtocol(pathUrl) {
+  return pathUrl.startsWith("//") ? `https:${pathUrl}` : pathUrl;
+}
+function getAssetPath(publicPath) {
+  const { pathname, protocol } = url.parse(addProtocol(publicPath));
+  return protocol && pathname ? pathname : encodeURI(publicPath);
+}
+
+const requestPath = process.env.PUBLIC_PATH
+  ? getAssetPath(process.env.PUBLIC_PATH)
+  : "/";
 
 export async function createServer(
   root = process.cwd(),
@@ -61,27 +73,22 @@ export async function createServer(
     });
     // use vite's connect instance as middleware
     app.use(vite.middlewares);
-    app.use(
-      expressStaticGzip(resolve("dist/client"), {
-        enableBrotli: true,
-        orderPreference: ["br"],
-        index: false,
-      })
-    );
+    app.use(requestPath, express.static("dist/client"));
   } else {
-    app.use(
+    app.use(requestPath, express.static("dist/client"));
+    /* app.use(
+      requestPath,
       expressStaticGzip(resolve("dist/client"), {
         enableBrotli: true,
         orderPreference: ["br"],
         index: false,
       })
-    );
+    ); */
     /* app.use(
       (await import("serve-static")).default(resolve("dist/client"), {
         index: false,
       })
     ); */
-
 
     // Cached CSS from Linaria
     app.get("/styles/:slug", (req, res) => {
@@ -92,8 +99,6 @@ export async function createServer(
   // loading render function needs to be moved out of the request handler due
   // to unknown bug with ssrLoadModule if it gets called again (such as on
   // page reload)
-  // @ts-ignore
-
   app.use("*", async (req, res) => {
     try {
       const url = req.originalUrl;
@@ -110,7 +115,7 @@ export async function createServer(
         render = (await import("./dist/server/server.js")).render;
       }
 
-      let head = '';
+      let head = "";
       if (!isProd) {
         head = template.match(/<head>(.+?)<\/head>/s)[1];
         // Re-inject fast-refresh script but with "async" tag so that it runs
@@ -125,7 +130,7 @@ export async function createServer(
       // Detection is being done using the stats file in production
       // let bootstrap;
       // if (isProd)
-        /* bootstrap =
+      /* bootstrap =
           "assets/" +
           fs
             .readdirSync("./dist/client/assets")
@@ -133,7 +138,14 @@ export async function createServer(
       const bootstrap = "src/entry/client.tsx";
 
       const context = {};
-      const criticalCss = await render(req, res, url, bootstrap, head, routeManifest);
+      const criticalCss = await render(
+        req,
+        res,
+        url,
+        bootstrap,
+        head,
+        routeManifest
+      );
 
       if (criticalCss) {
         // Cache the non-critical CSS for serving
@@ -158,8 +170,8 @@ export async function createServer(
 
 if (!isTest) {
   createServer().then(({ app, vite }) =>
-    app.listen(5173, () => {
-      console.log("http://localhost:5173");
+    app.listen(3000, () => {
+      console.log("http://localhost:3000"); 
     })
   );
 }
