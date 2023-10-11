@@ -10,15 +10,7 @@ export const routes: RouteObject[] = [
     // Declaring handle allows the server to pull the scripts needed based on
     // the entrypoint to avoid waterfall loading of dependencies
     handle: "src/components/HomePageRoute.tsx",
-  },
-  {
-    path: "/lazy",
-    loader: () => {
-      return "data";
-    },
-    lazy: () => import("./components/LazyPageRoute"),
-    handle: "src/components/LazyPageRoute.tsx",
-  },
+  }
 ];
 
 export const Wrapper = ({
