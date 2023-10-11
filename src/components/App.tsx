@@ -2,7 +2,12 @@ import { useRef, useCallback } from "react";
 import { css, cx } from "@linaria/core";
 import { t } from "@lingui/macro";
 import { useLoaderData } from "react-router-dom";
-import { graphql, usePreloadedQuery } from "react-relay";
+import {
+  graphql,
+  usePreloadedQuery,
+  useMutation,
+  ConnectionHandler,
+} from "react-relay";
 import { AppQuery as AppQueryType } from "../__generated__/AppQuery.graphql";
 import reactLogo from "../assets/react.svg";
 import viteLogo from "/vite.svg";
@@ -11,9 +16,37 @@ import "./index.css";
 import "../global/static.css";
 
 export const AppQuery = graphql`
-  query AppQuery {
-    jobs {
-      id
+  query AppQuery($cursor: String, $count: Int) {
+    jobs(after: $cursor, first: $count) @connection(key: "AppQuery_jobs") {
+      edges {
+        node {
+          id
+        }
+      }
+    }
+  }
+`;
+const AppMutation = graphql`
+  mutation AppMutation(
+    $time: JsDate!
+    $attempts: Int!
+    $interval: Int!
+    $form: FormInput!
+    $connections: [ID!]!
+  ) {
+    createJob(
+      input: {
+        time: $time
+        attempts: $attempts
+        interval: $interval
+        form: $form
+      }
+    ) {
+      jobEdge @appendEdge(connections: $connections) {
+        node {
+          id
+        }
+      }
     }
   }
 `;
@@ -28,6 +61,8 @@ const header = css`
 function App() {
   const ref = useLoaderData() as LoaderData<typeof loader>;
   const data = usePreloadedQuery<AppQueryType>(AppQuery, ref);
+  const [commitMutation, isMutationInFlight] = useMutation(AppMutation);
+
   const scheduleDateInput = useRef<HTMLInputElement>(null);
   const dateInput = useRef<HTMLInputElement>(null);
   const fieldInput = useRef<HTMLInputElement>(null);
@@ -36,6 +71,10 @@ function App() {
   const submit = useCallback(
     () => (e) => {
       e.preventDefault();
+      const connectionID = ConnectionHandler.getConnectionID(
+        "root",
+        "AppQuery_jobs"
+      );
       const createJobInput = {
         time: new Date(scheduleDateInput.current?.value),
         attempts: 5,
@@ -44,15 +83,16 @@ function App() {
           date: new Date(dateInput.current?.value),
           startTime: parseInt(startTimeInput.current?.value),
           endTime: parseInt(endTimeInput.current?.value),
-          field: '123',
-          shop: '2013'
-
-        }
-      }
-      console.log(createJobInput);
-      alert("Hello World!");
+          field: "123",
+          shop: "2013",
+        },
+        connections: [connectionID],
+      };
+      commitMutation({
+        variables: createJobInput,
+      });
     },
-    []
+    [commitMutation]
   );
   console.log(data);
   return (
@@ -61,19 +101,39 @@ function App() {
       <p className="mb-4">{t`Advanced Futsal Court Booking System`}</p>
       <div className="mb-4">
         <form onSubmit={submit()}>
-          <input type="text" name="date" ref={scheduleDateInput} placeholder="4/13/2023" />
-          <input type="text" name="date" ref={dateInput} placeholder="5/13/2023" />
+          <input
+            type="text"
+            name="date"
+            ref={scheduleDateInput}
+            placeholder="4/13/2023"
+          />
+          <input
+            type="text"
+            name="date"
+            ref={dateInput}
+            placeholder="5/13/2023"
+          />
           <input type="text" name="court" ref={fieldInput} placeholder="215" />
-          <input type="text" name="startTime" ref={startTimeInput} placeholder="1700" />
-          <input type="text" name="endTime" ref={endTimeInput} placeholder="2100" />
+          <input
+            type="text"
+            name="startTime"
+            ref={startTimeInput}
+            placeholder="1700"
+          />
+          <input
+            type="text"
+            name="endTime"
+            ref={endTimeInput}
+            placeholder="2100"
+          />
           <input type="submit" value="Schedule" />
         </form>
       </div>
-      {data.jobs.map((job) => {
+      {data.jobs.edges?.map((job) => {
         return (
           <div className="border-2 border-white rounded-md mb-4 p-4">
             <p className="">
-              {t`Scheduled`}: {job.id}
+              {t`Scheduled`}: {job?.node?.id}
             </p>
           </div>
         );
