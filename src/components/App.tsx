@@ -21,6 +21,18 @@ export const AppQuery = graphql`
       edges {
         node {
           id
+          status {
+            ... on Scheduled {
+              __typename
+              id
+              log
+            }
+            ... on Completed {
+              __typename
+              success
+              log
+            }
+          }
         }
       }
     }
@@ -58,6 +70,16 @@ const header = css`
   @apply font-bold py-10 px-4;
 `;
 
+function Status({ status }) {
+  console.log(status.__typename);
+  switch (status.__typename) {
+    case "Scheduled":
+      return <>{t`Status`}: {t`Scheduled`}</>;
+    default:
+      return <>{t`Status`}: {t`Completed`}</>;
+  }
+}
+
 function App() {
   const ref = useLoaderData() as LoaderData<typeof loader>;
   const data = usePreloadedQuery<AppQueryType>(AppQuery, ref);
@@ -66,6 +88,7 @@ function App() {
   const scheduleDateInput = useRef<HTMLInputElement>(null);
   const dateInput = useRef<HTMLInputElement>(null);
   const fieldInput = useRef<HTMLInputElement>(null);
+  const shopInput = useRef<HTMLInputElement>(null);
   const startTimeInput = useRef<HTMLInputElement>(null);
   const endTimeInput = useRef<HTMLInputElement>(null);
   const submit = useCallback(
@@ -80,11 +103,11 @@ function App() {
         attempts: 5,
         interval: 30,
         form: {
-          date: new Date(dateInput.current?.value),
+          date: dateInput.current?.value,
           startTime: parseInt(startTimeInput.current?.value),
           endTime: parseInt(endTimeInput.current?.value),
-          field: "123",
-          shop: "2013",
+          field: fieldInput.current?.value,
+          shop: shopInput.current?.value,
         },
         connections: [connectionID],
       };
@@ -99,41 +122,92 @@ function App() {
     <>
       <h1 className={header}>{t`FootBot`}</h1>
       <p className="mb-4">{t`Advanced Futsal Court Booking System`}</p>
-      <div className="mb-4">
-        <form onSubmit={submit()}>
-          <input
-            type="text"
-            name="date"
-            ref={scheduleDateInput}
-            placeholder="4/13/2023"
-          />
-          <input
-            type="text"
-            name="date"
-            ref={dateInput}
-            placeholder="5/13/2023"
-          />
-          <input type="text" name="court" ref={fieldInput} placeholder="215" />
-          <input
-            type="text"
-            name="startTime"
-            ref={startTimeInput}
-            placeholder="1700"
-          />
-          <input
-            type="text"
-            name="endTime"
-            ref={endTimeInput}
-            placeholder="2100"
-          />
-          <input type="submit" value="Schedule" />
-        </form>
+      <div className="grid">
+        <div className="mb-4 text-right">
+          <form onSubmit={submit()}>
+            <label>
+              Date
+              <input
+                className="ml-2 py-2 px-4"
+                type="text"
+                name="scheduleDate"
+                ref={scheduleDateInput}
+                placeholder="2023-07-21 23:59:59.4"
+              />
+            </label>
+            <br />
+            <label>
+              Target Date
+              <input
+                className="ml-2 py-2 px-4"
+                type="text"
+                name="date"
+                ref={dateInput}
+                placeholder="2023-08-20"
+              />
+            </label>
+            <br />
+            <label>
+              Shop
+              <input
+                className="ml-2 py-2 px-4"
+                type="text"
+                name="shop"
+                ref={shopInput}
+                placeholder="2013"
+              />
+            </label>
+            <br />
+            <label>
+              Field
+              <input
+                className="ml-2 py-2 px-4"
+                type="text"
+                name="court"
+                ref={fieldInput}
+                placeholder="912"
+              />
+            </label>
+            <br />
+            <label>
+              Start at
+              <input
+                className="ml-2 py-2 px-4"
+                type="text"
+                name="startTime"
+                ref={startTimeInput}
+                placeholder="1700"
+              />
+            </label>
+            <br />
+            <label>
+              End at
+              <input
+                className="ml-2 py-2 px-4"
+                type="text"
+                name="endTime"
+                ref={endTimeInput}
+                placeholder="2100"
+              />
+            </label>
+            <br />
+            <input className="py-2 px-4" type="submit" value="Schedule" />
+            <br />
+          </form>
+        </div>
       </div>
       {data.jobs.edges?.map((job) => {
         return (
-          <div className="border-2 border-white rounded-md mb-4 p-4">
+          <div
+            key={job?.node?.id}
+            className="border-2 border-white rounded-md mb-4 p-4"
+          >
             <p className="">
-              {t`Scheduled`}: {job?.node?.id}
+              {t`Scheduled`}: {job?.node?.id}{" "}
+              <Status status={job?.node?.status} />
+              <code className="text-sm sm:text-base inline-flex text-left items-center space-x-4 bg-gray-800 text-white rounded-lg p-4 pl-6 overflow-x-scroll whitespace-pre">
+                {job?.node?.status?.log}
+              </code>
             </p>
           </div>
         );

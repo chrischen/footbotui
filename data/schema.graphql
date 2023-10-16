@@ -7,8 +7,14 @@ type Query {
   """The current time on the server, as a timestamp."""
   currentTime: Float
   currentTime2: Float
+  currentTimeObj: CurrentTimeResponse!
+  currentTimeObj2: CurrentTimeResponse!
   job(id: ID!): Job
   jobs(after: String, before: String, first: Int, last: Int): JobConnection!
+}
+
+type CurrentTimeResponse {
+  currentTime: Float
 }
 
 type Job {
@@ -22,12 +28,13 @@ type Job {
 union Status = Completed | Scheduled
 
 type Completed {
-  message: String
+  log: String
   success: Boolean!
 }
 
 type Scheduled {
   id: ID!
+  log: String
 }
 
 scalar JsDate
@@ -74,7 +81,7 @@ input CreateJobInput {
 }
 
 input FormInput {
-  date: JsDate!
+  date: String!
   endTime: Int!
   field: String!
   shop: String!
