@@ -74,7 +74,7 @@ export async function createServer(
     // use vite's connect instance as middleware
     app.use(vite.middlewares);
   } else {
-    app.use(requestPath, express.static("dist/client"));
+    app.use(requestPath + "assets", express.static("dist/client/assets"));
     /* app.use(
       requestPath,
       expressStaticGzip(resolve("dist/client"), {

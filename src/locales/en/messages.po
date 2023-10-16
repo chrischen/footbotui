@@ -18,6 +18,18 @@ msgstr ""
 #~ msgid "helloworld"
 #~ msgstr ""
 
+#: src/components/App.tsx:124
+msgid "Advanced Futsal Court Booking System"
+msgstr ""
+
+#: src/components/App.tsx:79
+msgid "Completed"
+msgstr ""
+
+#: src/components/App.tsx:123
+msgid "FootBot"
+msgstr ""
+
 #: src/App.tsx:42
 #~ msgid "Hello"
 #~ msgstr ""
@@ -27,5 +39,15 @@ msgstr ""
 #~ msgstr ""
 
 #: src/App.tsx:42
-msgid "Helloa this is a cool feature"
+#~ msgid "Helloa this is a cool feature"
+#~ msgstr ""
+
+#: src/components/App.tsx:77
+#: src/components/App.tsx:206
+msgid "Scheduled"
+msgstr ""
+
+#: src/components/App.tsx:77
+#: src/components/App.tsx:79
+msgid "Status"
 msgstr ""
