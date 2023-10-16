@@ -183,7 +183,7 @@ let makeFetchQuery = () =>
     open RelayRouter.NetworkUtils
 
     fetch(
-      dev ? "http://localhost:4555/graphql" : "/graphql",
+      dev ? "http://localhost:4555/graphql" : "http://3.115.8.170:4555/graphql",
       {
         "method": "POST",
         "headers": Js.Dict.fromArray([("content-type", "application/json")]),
@@ -223,7 +223,7 @@ RescriptRelay.Network.fetchFunctionObservable => {
     open RelayRouter.NetworkUtils
 
     fetchServer(
-      dev ? "http://localhost:4555/graphql" : "https://www.instapainting.com/graphql",
+      dev ? "http://localhost:4555/graphql" : "http://3.115.8.170:4555/graphql",
       {
         "method": "POST",
         "headers": Js.Dict.fromArray([("content-type", "application/json")]),
