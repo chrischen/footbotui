@@ -73,7 +73,6 @@ export async function createServer(
     });
     // use vite's connect instance as middleware
     app.use(vite.middlewares);
-    app.use(requestPath, express.static("dist/client"));
   } else {
     app.use(requestPath, express.static("dist/client"));
     /* app.use(
