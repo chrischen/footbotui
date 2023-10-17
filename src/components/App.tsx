@@ -22,13 +22,11 @@ export const AppQuery = graphql`
         node {
           id
           status {
+            __typename
             ... on Scheduled {
-              __typename
-              id
               log
             }
             ... on Completed {
-              __typename
               success
               log
             }
@@ -57,6 +55,16 @@ const AppMutation = graphql`
       jobEdge @appendEdge(connections: $connections) {
         node {
           id
+          status {
+            __typename
+            ... on Scheduled {
+              log
+            }
+            ... on Completed {
+              success
+              log
+            }
+          }
         }
       }
     }
@@ -71,12 +79,19 @@ const header = css`
 `;
 
 function Status({ status }) {
-  console.log(status.__typename);
   switch (status.__typename) {
     case "Scheduled":
-      return <>{t`Status`}: {t`Scheduled`}</>;
+      return (
+        <>
+          {t`Status`}: {t`Scheduled`}
+        </>
+      );
     default:
-      return <>{t`Status`}: {t`Completed`}</>;
+      return (
+        <>
+          {t`Status`}: {t`Completed`}
+        </>
+      );
   }
 }
 
