@@ -3,7 +3,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import linaria from "@linaria/vite";
 import { lingui } from "@lingui/vite-plugin";
-// import relay from "vite-plugin-relay-lite";
 import relay from "vite-plugin-relay";
 import { splitVendorChunkPlugin } from "vite";
 // import { compression } from "vite-plugin-compression2";

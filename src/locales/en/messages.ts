@@ -1,1 +1,0 @@
-/*eslint-disable*/export const messages=JSON.parse("{\"helloworld\":\"helloworld\",\"VI/IQw\":\"Advanced Futsal Court Booking System\",\"qqWcBV\":\"Completed\",\"Ko/yJ8\":\"FootBot\",\"uzTaYi\":\"Hello\",\"SF1NlE\":\"Helloa\",\"TBLxh+\":\"Helloa this is a cool feature\",\"4ba0NE\":\"Scheduled\",\"uAQUqI\":\"Status\"}");

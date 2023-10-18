@@ -199,7 +199,7 @@ function adaptJsonIncrementalResponseToRelay(part) {
 
 function makeFetchQuery() {
   return RelaySSRUtils.makeClientFetchFunction(function (sink, operation, variables, _cacheConfig, _uploads) {
-              fetch("http://localhost:4555/graphql", {
+              fetch(import.meta.env.DEV ? Core__Option.getWithDefault(import.meta.env.API_ENDPOINT, "http://localhost:4555/graphql") : "/graphql", {
                       method: "POST",
                       headers: Js_dict.fromArray([[
                               "content-type",
@@ -223,7 +223,7 @@ function makeFetchQuery() {
 
 function makeServerFetchQuery(onQuery) {
   return RelaySSRUtils.makeServerFetchFunction(onQuery, (function (sink, operation, variables, _cacheConfig, _uploads) {
-                Core__Promise.$$catch(WebFetch.fetch("http://localhost:4555/graphql", {
+                Core__Promise.$$catch(WebFetch.fetch(Core__Option.getWithDefault(import.meta.env.API_ENDPOINT, "http://localhost:4555/graphql"), {
                             method: "POST",
                             headers: Js_dict.fromArray([[
                                     "content-type",
