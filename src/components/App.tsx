@@ -29,7 +29,7 @@ import {
 // if (!process.env.REACT_APP_CLERK_PUBLISHABLE_KEY) {
 //   throw new Error("Missing Publishable Key");
 // }
-// const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
+const clerkPubKey = import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY;
 
 // ORY stuff
 const basePath = "http://localhost:4000";
@@ -193,11 +193,7 @@ function App() {
 
   return (
     <SessionContext.Provider value={{}}>
-      <ClerkProvider
-        publishableKey={
-          "pk_test_c3Rlcmxpbmctc2VhaG9yc2UtMTkuY2xlcmsuYWNjb3VudHMuZGV2JA"
-        }
-      >
+      <ClerkProvider publishableKey={clerkPubKey}>
         <SignedIn>
           <h1 className={header}>{t`FootBot`}</h1>
           <p className="mb-4">{t`Advanced Futsal Court Booking System`}</p>
