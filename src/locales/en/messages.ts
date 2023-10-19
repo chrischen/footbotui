@@ -1,0 +1,1 @@
+/*eslint-disable*/export const messages=JSON.parse("{\"VI/IQw\":\"Advanced Futsal Court Booking System\",\"qqWcBV\":\"Completed\",\"Ko/yJ8\":\"FootBot\",\"4ba0NE\":\"Scheduled\",\"uAQUqI\":\"Status\"}");

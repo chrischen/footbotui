@@ -27,8 +27,8 @@ export default defineConfig({
     target: "node",
     noExternal:
       process.env.NODE_ENV === "production"
-        ? ["react-relay", "react-imgix"]
-        : [], // @NOTE: This option breaks SSR dev server
+        ? ["react-relay", "react-imgix", "@clerk/clerk-react", "@clerk/shared"]
+        : ["@clerk/clerk-react", "@clerk/shared"], // @NOTE: This option breaks SSR dev server
   },
   build: {
     sourcemap: true,
@@ -85,5 +85,5 @@ export default defineConfig({
   ],
   resolve: {
     // extensions: [".js", ".mjs", ".tsx", ".ts", ".jsx"],
-  }
+  },
 });
