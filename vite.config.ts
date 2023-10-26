@@ -85,5 +85,5 @@ export default defineConfig({
   ],
   resolve: {
     // extensions: [".js", ".mjs", ".tsx", ".ts", ".jsx"],
-  },
+  }
 });
